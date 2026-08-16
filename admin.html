@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دخول الإدارة — مركز السلامي</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--purple:#6d28d9;--purple-dark:#4c1d95;--purple-soft:#f3e8ff;--ink:#24143d;--muted:#6b5b7c;--line:#eadff5;--white:#fff;--danger:#b42318;--ok:#147a4b}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(145deg,#fff 0%,#faf7ff 55%,#f3e8ff 100%);color:var(--ink);font-family:Tahoma,Arial,sans-serif}button,input{font:inherit}.page{min-height:100vh;display:grid;place-items:center;padding:22px}.card{width:min(100%,430px);background:var(--white);border:1px solid var(--line);border-radius:24px;box-shadow:0 20px 70px #4c1d951f;padding:28px}.brand{display:flex;align-items:center;gap:12px;margin-bottom:25px}.mark{width:50px;height:50px;border-radius:16px;background:var(--purple);display:grid;place-items:center;color:#fff;font-size:25px;font-weight:900}.brand b{font-size:20px}.brand small{display:block;color:var(--muted);margin-top:4px}.eyebrow{color:var(--purple);font-size:13px;font-weight:800;margin:0 0 8px}.title{font-size:27px;margin:0 0 10px}.sub{color:var(--muted);line-height:1.8;margin:0 0 22px}.field{margin:0 0 14px}.field label{display:block;font-size:13px;font-weight:800;margin-bottom:7px}.field input{width:100%;border:1px solid #d9c7ee;border-radius:13px;padding:13px 14px;outline:none;background:#fff;color:var(--ink)}.field input:focus{border-color:var(--purple);box-shadow:0 0 0 4px #6d28d91a}.btn{width:100%;border:0;border-radius:13px;padding:14px;background:var(--purple);color:#fff;font-weight:900;cursor:pointer}.btn:hover{background:var(--purple-dark)}.btn:disabled{opacity:.55;cursor:wait}.msg{display:none;border-radius:12px;padding:11px 12px;font-size:13px;line-height:1.7;margin:14px 0}.msg.show{display:block}.msg.error{background:#fff1f0;color:var(--danger);border:1px solid #ffd4d0}.msg.ok{background:#effaf4;color:var(--ok);border:1px solid #c7eed8}.help{font-size:12px;color:var(--muted);line-height:1.8;margin:18px 0 0}.help code{direction:ltr;display:inline-block;background:var(--purple-soft);color:var(--purple-dark);padding:2px 5px;border-radius:5px}.hidden{display:none!important}.dash{width:min(100%,980px);padding:22px}.dash-head{display:flex;justify-content:space-between;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:16px}.dash-head h1{font-size:22px;margin:0 0 5px}.dash-head p{margin:0;color:var(--muted);font-size:13px}.logout{border:1px solid #d9c7ee;background:#fff;color:var(--purple-dark);border-radius:11px;padding:10px 14px;cursor:pointer;font-weight:800}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.stat small{display:block;color:var(--muted);margin-bottom:8px}.stat b{font-size:30px;color:var(--purple)}.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:16px}.panel h2{font-size:18px;margin:0 0 10px}.panel p{color:var(--muted);line-height:1.8}.tag{display:inline-block;background:var(--purple-soft);color:var(--purple-dark);padding:5px 9px;border-radius:999px;font-size:12px;font-weight:800}@media(max-width:650px){.grid{grid-template-columns:1fr}.dash-head{align-items:flex-start;flex-direction:column}.logout{width:100%}.card{padding:23px}}
+</style>
+</head>
+<body>
+<section id="loginPage" class="page"><main class="card">
+  <div class="brand"><div class="mark">م</div><div><b>مركز السلامي</b><small>لوحة إدارة التوريد بالجملة</small></div></div>
+  <p class="eyebrow">دخول آمن</p><h1 class="title">مرحبًا بك</h1><p class="sub">سجّل الدخول لإدارة المنتجات والنكهات والمخزون وطلبات أصحاب المكاتب.</p>
+  <form id="loginForm"><div class="field"><label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required placeholder="name@example.com"></div><div class="field"><label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required minlength="6" placeholder="••••••••"></div><button id="loginBtn" class="btn">دخول لوحة الإدارة</button></form>
+  <div id="loginMsg" class="msg"></div><p class="help">الحسابات المسموح لها بالدخول يجب أن تكون موجودة في Supabase ومضافة إلى جدول <code>admin_profiles</code>.</p>
+</main></section>
+<section id="dashboard" class="dash hidden"><header class="dash-head"><div><h1>لوحة إدارة مركز السلامي</h1><p id="who"></p></div><button class="logout" id="logoutBtn">تسجيل الخروج</button></header><div class="grid"><div class="stat"><small>المنتجات</small><b id="productsCount">—</b></div><div class="stat"><small>النكهات</small><b id="flavorsCount">—</b></div><div class="stat"><small>الطلبات الجديدة</small><b id="ordersCount">—</b></div></div><section class="panel"><span class="tag">متصل بقاعدة البيانات</span><h2>تم تسجيل الدخول بنجاح</h2><p>هذه هي نقطة البداية للوحة الإدارة. سيتم إضافة شاشات تعديل المنتجات والكراتين والنكهات والمخزون والطلبات فوق هذا الدخول المحمي.</p></section></section>
+<script>
+const SUPABASE_URL='https://uagxafosbllxjtrycwpr.supabase.co';
+const SUPABASE_KEY='sb_publishable_6b68WoNsWVFP64ALLIJQLA_q4lKrbHZ';
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=s=>document.querySelector(s);
+function message(text,type='error'){const el=$('#loginMsg');el.textContent=text;el.className='msg show '+type}
+async function loadDashboard(session){
+  const {data:profile,error:profileError}=await client.from('admin_profiles').select('display_name,role').eq('user_id',session.user.id).maybeSingle();
+  if(profileError||!profile){await client.auth.signOut();message('هذا الحساب غير مضاف كمشرف. أضف رقم المستخدم إلى جدول admin_profiles أولاً.');return}
+  $('#loginPage').classList.add('hidden');$('#dashboard').classList.remove('hidden');$('#who').textContent=(profile.display_name||session.user.email)+' — '+profile.role;
+  const [p,f,o]=await Promise.all([client.from('products').select('id',{count:'exact',head:true}),client.from('flavors').select('id',{count:'exact',head:true}),client.from('orders').select('id',{count:'exact',head:true}).eq('status','new')]);
+  $('#productsCount').textContent=p.count??'0';$('#flavorsCount').textContent=f.count??'0';$('#ordersCount').textContent=o.count??'0';
+}
+$('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('#loginBtn');btn.disabled=true;btn.textContent='جارٍ التحقق…';const {data,error}=await client.auth.signInWithPassword({email:$('#email').value.trim(),password:$('#password').value});if(error){message('تعذر تسجيل الدخول: '+error.message);btn.disabled=false;btn.textContent='دخول لوحة الإدارة';return}await loadDashboard(data.session);btn.disabled=false;btn.textContent='دخول لوحة الإدارة'});
+$('#logoutBtn').addEventListener('click',()=>client.auth.signOut().then(()=>location.reload()));
+client.auth.getSession().then(({data})=>{if(data.session)loadDashboard(data.session)});
+</script>
+</body></html>
