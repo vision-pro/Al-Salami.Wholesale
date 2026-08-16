@@ -454,6 +454,9 @@ footer .mas svg{width:16px;height:auto;fill:var(--text-3)}
   .btn-wa{min-height:54px}.step-note{font-size:11px}
 }
 @media(min-width:701px){.wholesale-note{font-size:15px}}
+.tools-actions{display:flex;align-items:center;gap:10px}.tools-actions .chips{flex:1}.quick-trigger{flex:0 0 auto;min-height:42px;padding:9px 14px;border-radius:999px;background:var(--accent);color:var(--bg);font-size:var(--t-xs);font-weight:900;white-space:nowrap}.quick-trigger:active{scale:.96}
+.quick-sheet{position:fixed;z-index:95;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);visibility:hidden;transition:transform .26s ease-out,visibility 0s .26s}.quick-sheet.open{transform:translateX(0);visibility:visible;transition:transform .38s var(--ease),visibility 0s}.quick-b{flex:1;overflow-y:auto;padding:16px}.quick-intro{margin:0 0 14px;padding:12px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--accent-dim);color:var(--text-2);font-size:var(--t-sm);line-height:1.65}.quick-row{display:grid;grid-template-columns:minmax(0,1fr) 130px 82px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}.quick-product{min-width:0;display:flex;flex-direction:column;gap:3px}.quick-product b{font-size:var(--t-sm);line-height:1.4}.quick-product span{font-size:var(--t-2xs);color:var(--accent)}.quick-flavor,.quick-cartons{width:100%;min-height:44px;border:1px solid var(--border-control);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);padding:9px;font:inherit}.quick-qty{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--text-3);font-weight:700}.quick-cartons{text-align:center;font-weight:900;color:var(--text)}
+@media(max-width:700px){.tools-actions{display:block}.quick-trigger{width:100%;margin-top:8px}.quick-row{grid-template-columns:1fr 74px;gap:8px}.quick-product{grid-column:1/-1}.quick-flavor{grid-column:1}.quick-qty{grid-column:2}.quick-b{padding:12px}.quick-sheet{width:100%;border-left:0}.quick-trigger{min-height:46px}.quick-flavor,.quick-cartons{min-height:48px}}
 </style>
 </head>
 <body>
@@ -520,7 +523,7 @@ footer .mas svg{width:16px;height:auto;fill:var(--text-3)}
       <input type="search" id="q" placeholder="ابحث عن منتج أو نكهة…" autocomplete="off">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg>
     </div>
-    <div class="chips" id="chips" role="group" aria-label="تصفية حسب الماركة"></div>
+    <div class="tools-actions"><div class="chips" id="chips" role="group" aria-label="تصفية حسب الماركة"></div><button class="quick-trigger" onclick="openQuick()" aria-label="فتح الطلب السريع">طلب سريع</button></div>
   </div>
 </div>
 
@@ -543,6 +546,15 @@ footer .mas svg{width:16px;height:auto;fill:var(--text-3)}
 </button>
 
 <div class="scrim" id="scrim" onclick="closeAll()"></div>
+
+<div class="quick-sheet" id="quick" role="dialog" aria-modal="true" aria-labelledby="quickH" inert>
+  <div class="sheet-h"><h2 id="quickH">طلب سريع بالجملة</h2><button class="x" onclick="closeAll()" aria-label="إغلاق الطلب السريع"><span aria-hidden="true">×</span></button></div>
+  <div class="quick-b">
+    <p class="quick-intro">اختر النكهة واكتب عدد الكراتين فقط. الكرتون يعني الكمية الجاهزة للبيع بالجملة.</p>
+    <div id="quickRows"></div>
+  </div>
+  <div class="sheet-f"><button class="btn-wa" onclick="addQuickToCart()">إضافة المحدد إلى طلب الجملة</button><p class="step-note">يمكنك تعديل الكميات لاحقًا من طلب الجملة.</p></div>
+</div>
 
 <!-- ============ السلة ============ -->
 <aside class="sheet" id="cart" role="dialog" aria-modal="true" aria-labelledby="cartH">
@@ -658,7 +670,7 @@ const CONFIG = {
    ================================================================ */
 const PRODUCTS = [
   {
-    id:1, key:"vozol", brand:"VOZOL", name:"Vozol Magic Flex 40000",
+    id:1, pack:10, key:"vozol", brand:"VOZOL", name:"Vozol Magic Flex 40000",
     img:"https://media.vaping360.com/images/vozol-magic-flex-40000-61a4142d.webp?imageType=Standard&MaxWidth=600&MaxHeight=600",
     puffs:"40,000 سحبة", nic:"20mg (2%)",
     specs:["بطارية 1000mAh قابلة للفصل", "نظام بودات متعدّد", "شاشة 3D", "وضعا ECO / POWER", "ملف ميش مزدوج", "شحن Type-C"],
@@ -672,7 +684,7 @@ const PRODUCTS = [
     ]
   },
   {
-    id:2, key:"vozol", brand:"VOZOL", name:"Vozol Gear Shisha 25K",
+    id:2, pack:10, key:"vozol", brand:"VOZOL", name:"Vozol Gear Shisha 25K",
     img:"https://smokingshops.com/cdn/shop/files/vozol_gear_shisha_25k.webp?v=1759696887&width=800",
     puffs:"25,000 سحبة (ECO) / 18,000 (POWER)", nic:"0.3%",
     specs:["بطارية 1000mAh", "شحن Type-C — 80٪ خلال 40 دقيقة", "نكهة شيشة", "وضعان ECO / POWER"],
@@ -690,7 +702,7 @@ const PRODUCTS = [
     ]
   },
   {
-    id:3, key:"vozol", brand:"VOZOL", name:"Vozol Star 40K",
+    id:3, pack:10, key:"vozol", brand:"VOZOL", name:"Vozol Star 40K",
     img:"https://elfvaping.com/wp-content/uploads/2025/06/Vozol-Star-40k-Puffs-LED-Screen-Low-Nicotine-Bulk-Buy-Original-Rechargeable-Disposable-Vapes-Wholesale-1.webp",
     puffs:"40,000 سحبة", nic:"20mg / 50mg",
     specs:["بطارية 1000mAh", "شاشة LED رقمية", "ملف ميش مزدوج", "وضعا Normal / Turbo", "شحن Type-C"],
@@ -708,7 +720,7 @@ const PRODUCTS = [
     ]
   },
   {
-    id:4, key:"fakher", brand:"AL FAKHER", name:"Al Fakher Crown Bar E-Hose X 60000",
+    id:4, pack:10, key:"fakher", brand:"AL FAKHER", name:"Al Fakher Crown Bar E-Hose X 60000",
     img:"https://euvapen.com/wp-content/uploads/2026/07/Al-Fakher-Crown-Bar-E-Hose-X-60k-puffs.webp",
     puffs:"60,000 سحبة", nic:"5mg (0.5%)",
     specs:["سائل 50 مل", "بطارية 1000mAh", "ملف ميش مزدوج 0.65Ω", "شاشة سائل وبطارية", "شحن Type-C"],
@@ -733,7 +745,7 @@ const PRODUCTS = [
     ]
   },
   {
-    id:5, key:"aaok", brand:"AAOK", name:"AAOK 80K",
+    id:5, pack:10, key:"aaok", brand:"AAOK", name:"AAOK 80K",
     img:"https://morevaping.com/imagecache/800/downloads/aaok-80k-1.jpg",
     puffs:"80,000 سحبة", nic:"35mg (3.5%)",
     specs:["سائل 25 مل", "بطارية 1000mAh", "ملف ميش 0.4Ω", "شحن Type-C"],
@@ -747,7 +759,7 @@ const PRODUCTS = [
     ]
   },
   {
-    id:6, key:"oxbar", brand:"OXBAR", name:"Oxbar Magic Maze 2 — 30000",
+    id:6, pack:10, key:"oxbar", brand:"OXBAR", name:"Oxbar Magic Maze 2 — 30000",
     img:"https://cdn.salla.sa/VzVl/7f3d719f-9a3e-44ca-b149-a64dd3838f8d-1000x994.76439790576-pg6Ejb3yTBNjIPnskT42ENLBme6LrNcqqdLTk0uc.png",
     puffs:"30,000 سحبة", nic:"50mg",
     specs:["سائل 20 مل", "بطارية 900mAh", "واط متغيّر 12–28W", "شاشة ذكية", "شحن Type-C"],
@@ -777,7 +789,7 @@ const CATS = [
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const money = n => n.toLocaleString('en-US');
-let cart = [];          // {id, flavor, qty}
+let cart = [];          // {id, flavor, cartons}
 let filter = "all";
 let query = "";
 const chosen = {};      // id -> النكهة المختارة
@@ -807,7 +819,7 @@ function passGate(){
   $('#gate').classList.add('hide');
   outsideGate().forEach(el => el.inert = false);
   document.body.classList.remove('locked');
-  setPanel($('#cart'), false); setPanel($('#form'), false);
+  setPanel($('#cart'), false); setPanel($('#form'), false); setPanel($('#quick'), false);
   setTimeout(()=>{ $('#gate').style.display='none'; $('#main').focus(); },220);
 }
 
@@ -853,7 +865,7 @@ function render(){
     return norm(p.name+' '+p.brand+' '+p.puffs+' '+p.nic+' '+p.specs.join(' ')+' '+p.flavors.join(' ')).includes(q);
   });
 
-  $('#secTitle').textContent = filter==='all' ? 'كل المنتجات' : CATS.find(c=>c.k===filter).n;
+  $('#secTitle').textContent = filter==='all' ? 'كتالوج الجملة' : CATS.find(c=>c.k===filter).n;
   $('#secCount').textContent = list.length ? `${list.length} منتج` : '';
 
   if(!list.length){
@@ -877,6 +889,7 @@ function render(){
         <div class="brand-n">${p.brand}</div>
         <h3>${p.name}</h3>
         <div class="meta">${[p.puffs,p.nic,...p.specs].filter(Boolean).map(x=>`<span>${x}</span>`).join('')}</div>
+        <div class="pack-meta"><b>الكرتون: ${p.pack} قطع</b><span>يُضاف كرتون واحد لكل ضغطة</span></div>
         ${p.flavors.length?`
           <div class="flav-lbl" id="flbl-${p.id}">النكهة <b>(${p.flavors.length})</b>${p.flavNote?` <em>— ${p.flavNote}</em>`:''}</div>
           <div class="flavs" id="flavs-${p.id}" role="group" aria-labelledby="flbl-${p.id}">${visibleFlavors(p).map(f=>
@@ -910,39 +923,67 @@ function shade(hex,amt){
   return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 
+/* ---- الطلب السريع بالجملة ---- */
+function openQuick(){
+  lastFocus = document.activeElement;
+  $('#quickRows').innerHTML = PRODUCTS.map(p=>`<div class="quick-row" data-quick-id="${p.id}">
+    <div class="quick-product"><b>${p.brand} — ${p.name}</b><span>الكرتون ${p.pack} قطع</span></div>
+    <select class="quick-flavor" aria-label="نكهة ${p.name}">${p.flavors.map(f=>`<option value="${enc(f)}">${ar(f)}</option>`).join('')}</select>
+    <label class="quick-qty"><span>كراتين</span><input class="quick-cartons" type="number" min="0" max="999" value="0" inputmode="numeric" aria-label="عدد كراتين ${p.name}"></label>
+  </div>`).join('');
+  $('#scrim').classList.add('open');
+  setPanel($('#cart'), false); setPanel($('#form'), false); setPanel($('#quick'), false); setPanel($('#quick'), true);
+  document.body.classList.add('locked');
+  $('#quick').querySelector('input')?.focus();
+}
+function addQuickToCart(){
+  let added = 0;
+  $$('#quickRows .quick-row').forEach(row=>{
+    const cartons = Math.max(0, parseInt(row.querySelector('.quick-cartons').value,10) || 0);
+    if(!cartons) return;
+    const id = +row.dataset.quickId;
+    const flavor = row.querySelector('.quick-flavor').value;
+    addToCart(id, null, cartons, flavor);
+    added += cartons;
+  });
+  if(!added){ toast('اكتب عدد الكراتين أولاً'); return; }
+  syncFab(); closeAll(); toast(`تمت إضافة ${added} كرتون إلى طلب الجملة`);
+}
+
 /* ---- السلة ---- */
-function addToCart(id,btn){
+function addToCart(id,btn,cartons=1,flavor=null){
   const p = PRODUCTS.find(x=>x.id===id);
-  const fl = chosen[id] || '';
+  const fl = flavor || chosen[id] || '';
   const ex = cart.find(c=>c.id===id && c.flavor===fl);
-  if(ex) ex.qty++; else cart.push({id,flavor:fl,qty:1});
+  if(ex) ex.cartons += cartons; else cart.push({id,flavor:fl,cartons});
   if(btn){
     const lbl = btn.querySelector('.lbl');
     btn.classList.add('done'); lbl.textContent='تمت';
     clearTimeout(btn._t);
-    btn._t = setTimeout(()=>{ btn.classList.remove('done'); lbl.textContent='أضف'; },1100);
+    btn._t = setTimeout(()=>{ btn.classList.remove('done'); lbl.textContent='أضف للطلب'; },1100);
   }
   toast(`أُضيف: ${p.name}${fl?' — '+ar(fl):''}`);
   syncFab();
 }
 function chQty(i,d){
-  cart[i].qty += d;
-  if(cart[i].qty<=0) cart.splice(i,1);
+  cart[i].cartons += d;
+  if(cart[i].cartons<=0) cart.splice(i,1);
   syncFab();
   if(!cart.length){ closeAll(); return; }
   drawCart();
   const btns = $$('#cartBody .qty button');
   (btns[Math.min(i*2, btns.length-1)])?.focus();
 }
-const total = () => cart.reduce((s,c)=>s + PRODUCTS.find(p=>p.id===c.id).price*c.qty, 0);
-const count = () => cart.reduce((s,c)=>s+c.qty, 0);
+const total = () => cart.reduce((s,c)=>s + PRODUCTS.find(p=>p.id===c.id).price*c.cartons, 0);
+const cartonCount = () => cart.reduce((s,c)=>s+c.cartons, 0);
+const unitCount = () => cart.reduce((s,c)=>s+(PRODUCTS.find(p=>p.id===c.id).pack*c.cartons), 0);
 
 function syncFab(){
-  const n = count();
+  const n = cartonCount();
   $('#fabN').textContent = n;
   $('#fabTxt').textContent = CONFIG.showPrices && n ? money(total())+' '+CONFIG.currency : 'طلب الجملة';
   $('#fab').classList.toggle('show', n>0);
-  $('#fab').setAttribute('aria-label', n ? `فتح السلة — ${n} قطعة` : 'فتح السلة');
+  $('#fab').setAttribute('aria-label', n ? `فتح طلب الجملة — ${n} كرتون` : 'فتح طلب الجملة');
 }
 
 function drawCart(){
@@ -958,18 +999,19 @@ function drawCart(){
       <div class="info">
         <div class="nm">${p.name}</div>
         ${c.flavor?`<div class="fl">${ar(c.flavor)}${en(c.flavor)?` <span style="color:var(--text-3);font-weight:500">· ${en(c.flavor)}</span>`:''}</div>`:''}
-        <div class="pr">${CONFIG.showPrices? 'الكمية '+c.qty+' · الإجمالي '+money(p.price*c.qty)+' '+CONFIG.currency : 'سعر الجملة عند التواصل'}</div>
+        <div class="pr">${CONFIG.showPrices? 'الكراتين '+c.cartons+' · القطع '+(p.pack*c.cartons)+' · الإجمالي '+money(p.price*c.cartons)+' '+CONFIG.currency : 'سعر الجملة عند التواصل'}</div>
       </div>
       <div class="qty">
-        <button onclick="chQty(${i},1)" aria-label="زيادة كمية ${p.name}">+</button>
-        <div class="v">${c.qty}</div>
-        <button onclick="chQty(${i},-1)" aria-label="إنقاص كمية ${p.name}">−</button>
+        <button onclick="chQty(${i},1)" aria-label="زيادة عدد كراتين ${p.name}">+</button>
+        <div class="v">${c.cartons}</div>
+        <button onclick="chQty(${i},-1)" aria-label="إنقاص عدد كراتين ${p.name}">−</button>
       </div>
     </div>`;
   }).join('');
 
   $('#cartFoot').innerHTML = `
-    <div class="tot"><span>إجمالي الوحدات</span><span>${count()}</span></div>
+    <div class="tot"><span>إجمالي الكراتين</span><span>${cartonCount()}</span></div>
+    <div class="tot"><span>إجمالي القطع</span><span>${unitCount()}</span></div>
     ${CONFIG.showPrices?`<div class="tot"><span>أجور التوصيل</span><span>تُحدَّد حسب المنطقة</span></div>
     <div class="tot big"><span>المجموع</span><span>${money(total())} ${CONFIG.currency}</span></div>`:''}
 <button class="btn-wa" onclick="goForm()">
@@ -978,7 +1020,7 @@ function drawCart(){
     </button>
     <button class="btn-gh" onclick="clearCart()">إفراغ طلب الجملة</button>`;
 }
-function clearCart(){ cart=[]; syncFab(); drawCart(); closeAll(); toast('تم إفراغ السلة'); }
+function clearCart(){ cart=[]; syncFab(); drawCart(); closeAll(); toast('تم إفراغ طلب الجملة'); }
 
 /* ---- اللوحات: inert يمنع الوصول إليها بالكيبورد وهي مغلقة ---- */
 let lastFocus = null;
@@ -987,22 +1029,22 @@ function openCart(){
   lastFocus = document.activeElement;
   drawCart();
   $('#scrim').classList.add('open');
-  setPanel($('#cart'), true); setPanel($('#form'), false);
+  setPanel($('#cart'), true); setPanel($('#form'), false); setPanel($('#quick'), false);
   document.body.classList.add('locked');
   $('#cart').querySelector('.x').focus();
 }
 function goForm(){
-  setPanel($('#cart'), false); setPanel($('#form'), true);
+  setPanel($('#cart'), false); setPanel($('#form'), true); setPanel($('#quick'), false);
   $('#fTot').textContent = CONFIG.showPrices ? money(total())+' '+CONFIG.currency : '—';
   $('#i-name').focus();
 }
 function backToCart(){
-  setPanel($('#form'), false); setPanel($('#cart'), true);
+  setPanel($('#form'), false); setPanel($('#quick'), false); setPanel($('#cart'), true);
   $('#cart').querySelector('.x').focus();
 }
 function closeAll(){
   $('#scrim').classList.remove('open');
-  setPanel($('#cart'), false); setPanel($('#form'), false);
+  setPanel($('#cart'), false); setPanel($('#form'), false); setPanel($('#quick'), false);
   document.body.classList.remove('locked');
   lastFocus?.focus();
 }
@@ -1012,7 +1054,8 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && $('#scrim').clas
 document.addEventListener('keydown', e=>{
   if(e.key!=='Tab') return;
   const panel = $('#cart').classList.contains('open') ? $('#cart')
-              : $('#form').classList.contains('open') ? $('#form') : null;
+              : $('#form').classList.contains('open') ? $('#form')
+              : $('#quick').classList.contains('open') ? $('#quick') : null;
   if(!panel) return;
   const f = [...panel.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')]
             .filter(el=>!el.disabled && el.offsetParent!==null);
@@ -1060,11 +1103,12 @@ function sendWA(){
     const full = p.name.toLowerCase().includes(p.brand.toLowerCase()) ? p.name : `${p.brand} ${p.name}`;
     L.push(`${i+1}. ${full}`);
     if(c.flavor) L.push(`   • النكهة: ${both(c.flavor)}`);
-    L.push(`   • الكمية: ${c.qty}`);
-    if(CONFIG.showPrices) L.push(`   • الإجمالي: ${money(p.price*c.qty)} ${CONFIG.currency}`);
+    L.push(`   • الكراتين: ${c.cartons} (نحو ${p.pack*c.cartons} قطعة)`);
+    if(CONFIG.showPrices) L.push(`   • الإجمالي: ${money(p.price*c.cartons)} ${CONFIG.currency}`);
   });
   L.push('━━━━━━━━━━━━━━');
-  L.push(`عدد القطع: ${count()}`);
+  L.push(`عدد الكراتين: ${cartonCount()}`);
+  L.push(`عدد القطع التقريبي: ${unitCount()}`);
   if(CONFIG.showPrices) L.push(`*المجموع: ${money(total())} ${CONFIG.currency}* (عدا أجور التوصيل)`);
   L.push('━━━━━━━━━━━━━━');
   L.push(`الاسم: ${name}`);
@@ -1096,7 +1140,7 @@ addEventListener('load', fitTop);
   },{passive:true});
 });
 
-setPanel($('#cart'), false); setPanel($('#form'), false);
+setPanel($('#cart'), false); setPanel($('#form'), false); setPanel($('#quick'), false);
 render(); syncFab(); fitTop(); lockGate();
 </script>
 </body>
